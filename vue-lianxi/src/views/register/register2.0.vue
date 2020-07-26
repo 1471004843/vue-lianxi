@@ -58,23 +58,10 @@
   </div>
 </template>
 <script>
-import { reactive, ref, onMounted } from "@vue/composition-api";
-import {
-  stripscript,
-  validateEmail,
-  validatePass,
-  validateVcode
-} from "@/utils/validate";
+import { stripscript,validateEmail,validatePass,validateVcode} from "@/utils/validate";
 export default {
   name: "register",
-  setup(props, { refs }) {
-    // 这里面放置data数据、生命周期、自定义的函数
-    // context.attrs
-    // context.slots
-    // context.parent
-    // context.root
-    // context.emit
-    // context.refs
+  data() {
     //   验证用户名
     var validateUsername = (rule, value, callback) => {
       if (value === "") {
@@ -88,8 +75,8 @@ export default {
     //   验证密码
     var validatePassword = (rule, value, callback) => {
       // 过滤后的数据
-     ruleForm.password = stripscript(value);
-      value = ruleForm.password;
+      this.ruleForm.password = stripscript(value)
+      value = this.ruleForm.password
       if (value === "") {
         callback(new Error("请输入密码"));
       } else if (validatePass(value)) {
@@ -100,11 +87,11 @@ export default {
     };
     // 验证重复密码
     var validatePasswords = (rule, value, callback) => {
-      ruleForm.passwords = stripscript(value);
-      value = ruleForm.passwords;
+      this.ruleForm.passwords = stripscript(value)
+      value = this.ruleForm.passwords
       if (value === "") {
         callback(new Error("请输入重复密码"));
-      } else if (value != ruleForm.password) {
+      } else if (value != this.ruleForm.password) {
         callback(new Error("重复密码不正确"));
       } else {
         callback();
@@ -120,35 +107,38 @@ export default {
         callback();
       }
     };
-    const menuTab = reactive([
-      { txt: "登录", current: true, type: "login" },
-      { txt: "注册", current: false, type: "register" }
-    ]);
-    // 模块值
-    const model = ref("login");
-    const ruleForm = reactive({
-      username: "",
-      password: "",
-      passwords: "",
-      code: ""
-    });
-    // 表单的验证
-    const rules = reactive({
-      username: [{ validator: validateUsername, trigger: "blur" }],
-      password: [{ validator: validatePassword, trigger: "blur" }],
-      passwords: [{ validator: validatePasswords, trigger: "blur" }],
-      code: [{ validator: checkCode, trigger: "blur" }]
-    });
-    // 声明函数
-    const toggleMenu = data => {
-      menuTab.forEach(elem => {
+    return {
+      menuTab: [
+        { txt: "登录", current: true,type:"login"},
+        { txt: "注册", current: false ,type:"register"}
+      ],
+      model:"login",
+      ruleForm: {
+        username: "",
+        password: "",
+        passwords: "",
+        code: ""
+      },
+      rules: {
+        username: [{ validator: validateUsername, trigger: "blur" }],
+        password: [{ validator: validatePassword, trigger: "blur" }],
+        passwords: [{ validator: validatePasswords, trigger: "blur" }],
+        code: [{ validator: checkCode, trigger: "blur" }]
+      }
+    };
+  },
+  created() {},
+  mounted() {},
+  methods: {
+    toggleMenu(data) {
+      this.menuTab.forEach(elem => {
         elem.current = false;
       });
-      model.value = data.type;
+      this.model=data.type;
       data.current = true;
-    };
-    const submitForm = formName => {
-     refs[formName].validate(valid => {
+    },
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
         if (valid) {
           alert("submit!");
         } else {
@@ -156,16 +146,7 @@ export default {
           return false;
         }
       });
-    };
-    onMounted(() => {});
-    return {
-      menuTab,
-      model,
-      toggleMenu,
-      submitForm,
-      ruleForm,
-      rules
-    };
+    }
   },
   props: {},
   watch: {}

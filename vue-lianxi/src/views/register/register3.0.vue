@@ -19,8 +19,19 @@
         <el-form-item prop="password" class="form-item">
           <label>密码</label>
           <el-input
-            type="password"
+            type="text"
             v-model="ruleForm.password"
+            autocomplete="off"
+            minlength="6"
+            maxlength="20"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item prop="passwords" class="form-item" v-if="model=='register'">
+          <label>重复密码</label>
+          <el-input
+            type="password"
+            v-model="ruleForm.passwords"
             autocomplete="off"
             minlength="6"
             maxlength="20"
@@ -47,10 +58,23 @@
   </div>
 </template>
 <script>
-import { stripscript,validateEmail,validatePass,validateVcode} from "@/utils/validate";
+import { reactive, ref, onMounted } from "@vue/composition-api";
+import {
+  stripscript,
+  validateEmail,
+  validatePass,
+  validateVcode
+} from "@/utils/validate";
 export default {
-  name: "login",
-  data() {
+  name: "register",
+  setup(props, { refs }) {
+    // 这里面放置data数据、生命周期、自定义的函数
+    // context.attrs
+    // context.slots
+    // context.parent
+    // context.root
+    // context.emit
+    // context.refs
     //   验证用户名
     var validateUsername = (rule, value, callback) => {
       if (value === "") {
@@ -64,12 +88,24 @@ export default {
     //   验证密码
     var validatePassword = (rule, value, callback) => {
       // 过滤后的数据
-      this.ruleForm.password = stripscript(value)
-      value = this.ruleForm.password
+      ruleForm.password = stripscript(value);
+      value = ruleForm.password;
       if (value === "") {
         callback(new Error("请输入密码"));
       } else if (validatePass(value)) {
         callback(new Error("密码为6-20位数字+字母"));
+      } else {
+        callback();
+      }
+    };
+    // 验证重复密码
+    var validatePasswords = (rule, value, callback) => {
+      ruleForm.passwords = stripscript(value);
+      value = ruleForm.passwords;
+      if (value === "") {
+        callback(new Error("请输入重复密码"));
+      } else if (value != ruleForm.password) {
+        callback(new Error("重复密码不正确"));
       } else {
         callback();
       }
@@ -84,34 +120,35 @@ export default {
         callback();
       }
     };
-    return {
-      menuTab: [
-        { txt: "登录", current: true },
-        { txt: "注册", current: false }
-      ],
-      ruleForm: {
-        username: "",
-        password: "",
-        code: ""
-      },
-      rules: {
-        username: [{ validator: validateUsername, trigger: "blur" }],
-        password: [{ validator: validatePassword, trigger: "blur" }],
-        code: [{ validator: checkCode, trigger: "blur" }]
-      }
-    };
-  },
-  created() {},
-  mounted() {},
-  methods: {
-    toggleMenu(data) {
-      this.menuTab.forEach(elem => {
+    const menuTab = reactive([
+      { txt: "登录", current: true, type: "login" },
+      { txt: "注册", current: false, type: "register" }
+    ]);
+    // 模块值
+    const model = ref("login");
+    const ruleForm = reactive({
+      username: "",
+      password: "",
+      passwords: "",
+      code: ""
+    });
+    // 表单的验证
+    const rules = reactive({
+      username: [{ validator: validateUsername, trigger: "blur" }],
+      password: [{ validator: validatePassword, trigger: "blur" }],
+      passwords: [{ validator: validatePasswords, trigger: "blur" }],
+      code: [{ validator: checkCode, trigger: "blur" }]
+    });
+    // 声明函数
+    const toggleMenu = data => {
+      menuTab.forEach(elem => {
         elem.current = false;
       });
+      model.value = data.type;
       data.current = true;
-    },
-    submitForm(formName) {
-      this.$refs[formName].validate(valid => {
+    };
+    const submitForm = formName => {
+        refs[formName].validate(valid => {
         if (valid) {
           alert("submit!");
         } else {
@@ -119,7 +156,16 @@ export default {
           return false;
         }
       });
-    }
+    };
+    onMounted(() => {});
+    return {
+      menuTab,
+      model,
+      toggleMenu,
+      submitForm,
+      ruleForm,
+      rules
+    };
   },
   props: {},
   watch: {}

@@ -4,6 +4,7 @@ const { config } = require('process')
 module.exports = {
     // 部署应用时的基本 URL
     publicPath: process.env.NODE_ENV === 'production' ? '' : '/',
+    // 输出文件目录
     outputDir: process.env.NODE_ENV === 'production' ? 'dist' : 'devdist',
 
     // build时构建文件的目录 构建时传入 --no-clean 可关闭该行为
@@ -70,7 +71,37 @@ module.exports = {
     },
 
     // 所有 webpack-dev-server 的选项都支持
-    devServer: {},
+    devServer: {
+        // 编译完成时是否打开网页
+        open: false,
+        // 指定使用地址，默认localhost,0.0.0.0代表可以被外界访问
+        host: "0.0.0.0",
+        // 访问端口
+        port: 8080,
+        // 编译失败时刷新页面
+        https: false,
+        // 开启热加载
+        hot: true,
+        hotOnly: false,
+        // 设置代理
+        proxy:null,
+        proxy: {
+            '/devApi': {
+                target: 'http://www.web.jshtml.cn/productapi',//设置你调用的接口域名和端口号 别忘了加http
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/devApi': ''//这里理解成用‘/devApi’代替target里面的地址，后面组件中我们掉接口时直接用api代替 比如我要调用'http://40.00.100.100:3002/user/add'，直接写‘/api/user/add’即可
+                }
+            }
+        },
+        overlay: {
+            // 全屏模式下是否显示脚本错误
+            warnings: true,
+            errors: true
+        },
+        before: app => { }
+
+    },
 
     // 是否为 Babel 或 TypeScript 使用 thread-loader
     parallel: require('os').cpus().length > 1,

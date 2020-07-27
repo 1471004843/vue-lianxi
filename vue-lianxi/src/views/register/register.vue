@@ -45,7 +45,7 @@
               <el-input v-model.number="ruleForm.code" minlength="6" maxlength="6"></el-input>
             </el-col>
             <el-col :span="9">
-              <el-button type="success" class="block">获取验证码</el-button>
+              <el-button type="success" class="block" @click="getSms()">获取验证码</el-button>
             </el-col>
           </el-row>
         </el-form-item>
@@ -58,6 +58,7 @@
   </div>
 </template>
 <script>
+import { GetSms } from"@/api/register"
 import { reactive, ref, onMounted } from "@vue/composition-api";
 import {
   stripscript,
@@ -88,7 +89,7 @@ export default {
     //   验证密码
     var validatePassword = (rule, value, callback) => {
       // 过滤后的数据
-     ruleForm.password = stripscript(value);
+      ruleForm.password = stripscript(value);
       value = ruleForm.password;
       if (value === "") {
         callback(new Error("请输入密码"));
@@ -147,8 +148,28 @@ export default {
       model.value = data.type;
       data.current = true;
     };
+    // 获取验证码
+     const getSms = (()=>{
+       GetSms()
+     });
+    // 提交表单
     const submitForm = formName => {
-     refs[formName].validate(valid => {
+      // axios.request({
+      //     method: "get",
+      //     url: "/user/12345",
+      //     data: {
+      //       firstName: "Fred",
+      //       lastName: "Flintstone"
+      //     }
+      //   })
+      //   .then(function(response) {
+      //     console.log(response);
+      //   })
+      //   .catch(function(error) {
+      //     console.log(error);
+      //   });
+
+      refs[formName].validate(valid => {
         if (valid) {
           alert("submit!");
         } else {
@@ -157,14 +178,17 @@ export default {
         }
       });
     };
-    onMounted(() => {});
+    onMounted(() => {
+      // console.log(process.env.VUE_APP_ABC)   
+    });
     return {
       menuTab,
       model,
       toggleMenu,
       submitForm,
       ruleForm,
-      rules
+      rules,
+      getSms
     };
   },
   props: {},

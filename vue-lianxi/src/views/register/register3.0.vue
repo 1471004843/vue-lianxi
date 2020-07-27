@@ -58,6 +58,7 @@
   </div>
 </template>
 <script>
+import {login} from './data/data'
 import { reactive, ref, onMounted } from "@vue/composition-api";
 import {
   stripscript,
@@ -65,6 +66,7 @@ import {
   validatePass,
   validateVcode
 } from "@/utils/validate";
+import { format } from 'path';
 export default {
   name: "register",
   setup(props, { refs }) {
@@ -110,6 +112,7 @@ export default {
         callback();
       }
     };
+    console.log(login)
     // 校验验证码
     var checkCode = (rule, value, callback) => {
       if (value === "") {

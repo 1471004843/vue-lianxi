@@ -37,8 +37,11 @@ service.interceptors.response.use(
 
 service.request({
   method: "post",
-  url: "/getSms/",
-  data: {}
+  url: "/LoginVertify/",
+  data: {
+      UserID:'1000',
+      PassWord:'a15312981111'
+  }
 });
 export default service;
 // 使用export default(只能暴露一个节点),引入文件时import不需要用花括号；

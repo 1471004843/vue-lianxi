@@ -8,7 +8,7 @@ module.exports = {
     outputDir: process.env.NODE_ENV === 'production' ? 'dist' : 'devdist',
 
     // build时构建文件的目录 构建时传入 --no-clean 可关闭该行为
-    lintOnSave: true,
+    lintOnSave: false,
 
     // build时放置生成的静态资源 (js、css、img、fonts) 的 (相对于 outputDir 的) 目录
     chainWebpack: (config) => { },
@@ -19,7 +19,8 @@ module.exports = {
             extensions: [".js", ".json", ".vue"],
             alias: {
                 "@": path.resolve(__dirname, "./src"),
-                "@c": path.resolve(__dirname, "./src/components")
+                "@c": path.resolve(__dirname, "./src/components"),
+                "@api": path.resolve(__dirname, "./src/api")
             }
         }
     },
@@ -29,7 +30,7 @@ module.exports = {
 
 
     // 是否在开发环境下通过 eslint-loader 在每次保存时 lint 代码 (在生产构建时禁用 eslint-loader)
-    lintOnSave: process.env.NODE_ENV !== 'production',
+    // lintOnSave: process.env.NODE_ENV !== 'production',
 
     // 是否使用包含运行时编译器的 Vue 构建版本
     runtimeCompiler: false,
@@ -87,12 +88,16 @@ module.exports = {
         proxy:null,
         proxy: {
             '/devApi': {
-                target: 'http://www.web.jshtml.cn/productapi',//设置你调用的接口域名和端口号 别忘了加http
+                target: 'http://rs.kooci.net',//设置你调用的接口域名和端口号 别忘了加http
                 changeOrigin: true,
-                pathRewrite: {
-                    '^/devApi': ''//这里理解成用‘/devApi’代替target里面的地址，后面组件中我们掉接口时直接用api代替 比如我要调用'http://40.00.100.100:3002/user/add'，直接写‘/api/user/add’即可
-                }
-            }
+                pathRewrite: {}
+            },
+            "/LoginVertify": {
+                target: "http://rs.kooci.net/",
+                changeOrigin: true,
+                ws: true,
+                pathRewrite: {},
+              },
         },
         overlay: {
             // 全屏模式下是否显示脚本错误

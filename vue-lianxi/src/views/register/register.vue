@@ -246,8 +246,37 @@ export default {
       //   });
 
       refs[formName].validate(valid => {
+        // 表单验证通过
         if (valid) {
-          let requestData = {
+          // 三元运算
+          model.value === "login"? login():register();
+          // if(model.value === "login"){
+          //   login()
+          // }else{
+          //   register()
+          // }
+        }else{
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    };
+    // 登录
+    const login = (() => {
+      let requestData = {
+         username: ruleForm.username,
+         password: ruleForm.password,
+         code: ruleForm.code,
+      }
+      Login(requestData).then(response => {
+        console.log(response);
+        console.log("登陆结果");
+        }).catch(error => {
+      })
+    })
+    // 注册
+    const register = (() => {
+      let requestData = {
             username: ruleForm.username,
             password: ruleForm.password,
             code: ruleForm.code,
@@ -264,17 +293,10 @@ export default {
               // 模拟注册成功
               toggleMenu(menuTab[0]);
               clearCountDown();
-            })
-            .catch(error => {
+            }).catch(error => {
               // 失败时执行的代码
             });
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
-    };
-    // 登录
+        })
 
     // 倒计时
     const countDown = number => {

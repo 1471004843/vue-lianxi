@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Message } from 'element-ui';
 
 // 创建axios，赋给变量service
 // 手把手撸码前端API，地址 http://www.web.jshtml.cn/productapi
@@ -6,7 +7,8 @@ import axios from "axios";
 const BASEURL = process.env.NODE_ENV === "production" ? "" : "/devApi";
 const service = axios.create({
   baseURL: BASEURL,
-  timeout: 1000
+  timeout: 15000
+  // 网络请求超时时间 
 });
 
 // console.log(process.env.NODE_ENV);j
@@ -27,7 +29,15 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   function(response) {
     // 对响应数据做点什么
-    return response;
+    let data = response.data
+    
+    if(data.resCode !== 0){
+      Message.error(data.message)
+      return Promise.reject(data);
+    }else{
+         return response;
+    }
+    
   },
   function(error) {
     // 对响应错误做点什么

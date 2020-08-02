@@ -13,10 +13,20 @@ const service = axios.create({
 
 // console.log(process.env.NODE_ENV);j
 // console.log(process.env.VUE_APP_ABC);
-// 添加请求拦截器
+
+// 请求接口前，做一些数据处理(请求拦截器)
 service.interceptors.request.use(
   function(config) {
     // 在发送请求之前做些什么
+    // 后台需要前端这边传相关的参数(在请求头添加参数)
+    //  Tokey,userId,sui
+    console.log(config.headers);
+    // 业务需求
+    // 最终目的就是在请求头添加参数
+    config.headers["Tokey"] = "111111"
+    config.headers["userId"] = "333333"
+    config.headers["sui"] = "222222"
+
     return config;
   },
   function(error) {
@@ -25,11 +35,12 @@ service.interceptors.request.use(
   }
 );
 
-// 添加响应拦截器
+// 请求接口后，返回数据进行拦截(响应拦截器)
 service.interceptors.response.use(
   function(response) {
     // 对响应数据做点什么
     let data = response.data
+    // 业务需求
     
     if(data.resCode !== 0){
       Message.error(data.message)

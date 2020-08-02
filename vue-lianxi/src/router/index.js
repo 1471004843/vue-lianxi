@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Register from '../views/register/register.vue'
+import Console from '../views/Layout/index.vue'
+import ConsoleIndex from '../views/Console/console.vue'
 Vue.use(VueRouter)
 
   const routes = [
@@ -12,6 +14,18 @@ Vue.use(VueRouter)
     path: '/register',
     name: 'register',
     component: Register
+  },
+  {
+    path: '/console',
+    name: 'console',
+    component: Console,
+    children:[
+      {
+        path: '/console',
+        name: 'console',
+        component: ConsoleIndex
+      },
+    ]
   },
   {
     path: '/about',

@@ -69,6 +69,7 @@
   </div>
 </template>
 <script>
+import sha1 from "js-sha1";
 import { GetSms, Register, Login } from "@/api/register";
 import { reactive, ref, onMounted } from "@vue/composition-api";
 import {
@@ -171,8 +172,11 @@ export default {
       passwords: [{ validator: validatePasswords, trigger: "blur" }],
       code: [{ validator: checkCode, trigger: "blur" }]
     });
+    // 1.不建议在一个方法里面做多件不同的事情（尽可能只做自己本身的事，不要做其他人的事情）
+    // 2.尽量把相同的事情封装在一个方法里面，通过调用函数执行
+
     // 声明函数
-    // 状态切换
+    // 切换模块
     const toggleMenu = data => {
       menuTab.forEach(elem => {
         elem.current = false;
@@ -181,10 +185,15 @@ export default {
       data.current = true;
       // 修改模块值
       model.value = data.type;
-      // 重置表单
+      resetFormData();
+      clearInterval();
+    };
+    // 清除表单数据
+    const resetFormData = (() => {
+       // 重置表单
       // this.$refs[formName].resetFields(); 2.0写法
       refs.loginForm.resetFields();
-    };
+    })
     // 获取验证码
     const getSms = () => {
       //  进行提示
@@ -196,14 +205,21 @@ export default {
         root.$message.error("邮箱格式错误，请重新输入！！");
         return false;
       }
+      // 更新按钮的状态
+      const updataButtonStatus = ((params) =>{
+         codeButtonStatus.status = params.status;
+         codeButtonStatus.text = params.text;
+      })
       // 获取验证码
       let requestData = {
         username: ruleForm.username,
         module: model.value
       };
-      // 修改获取验证码按钮的状态
-      codeButtonStatus.status = true;
-      codeButtonStatus.text = "发送中";
+      // 修改获取验证码按钮状态
+      updataButtonStatus({
+          status: true,
+           text: "发送中"
+        })
       // codeButtonStatus.value = true;
       // codeButtonText.value= "发送中";
 
@@ -265,20 +281,24 @@ export default {
     const login = (() => {
       let requestData = {
          username: ruleForm.username,
-         password: ruleForm.password,
+         password: sha1(ruleForm.password),
          code: ruleForm.code,
       }
       Login(requestData).then(response => {
         console.log(response);
-        console.log("登陆结果");
-        }).catch(error => {
+        console.log("登陆成功");
+        // 页面跳转
+        root.$router.push({
+          name:"console"
+          })
+      }).catch(error => {
       })
     })
     // 注册
     const register = (() => {
       let requestData = {
             username: ruleForm.username,
-            password: ruleForm.password,
+            password: sha1(ruleForm.password),
             code: ruleForm.code,
             module: "register"
           };
@@ -312,8 +332,10 @@ export default {
         time--;
         if (time === 0) {
           clearInterval(timer.value);
-          codeButtonStatus.status = false;
-          codeButtonStatus.text = "再次获取";
+          updataButtonStatus({
+           status: false,
+            text: "再次获取"
+        })
         } else {
           codeButtonStatus.text = `倒计时${time}秒`;
           // ES5:codeButtonStatus.text = '倒计时' + time + '秒'
@@ -323,8 +345,10 @@ export default {
     // 清除倒计时
     const clearCountDown = () => {
       // 还原验证码默认状态
-      codeButtonStatus.status = false;
-      codeButtonStatus.text = "获取验证码";
+      updataButtonStatus({
+          status: false,
+           text : "获取验证码"
+        })
       // 清除倒计时
       clearInterval(timer.value);
       // const codeButtonStatus = reactive({
@@ -333,7 +357,7 @@ export default {
       // })
     };
 
-    // 生命周期，挂载完成后
+    // 生命周期,挂载完成后
     onMounted(() => {
       // console.log(process.env.VUE_APP_ABC)
     });
@@ -396,3 +420,16 @@ export default {
   margin-top: 19px;
 }
 </style>
+
+// 密码加密：
+// 1.在前端预先加密一次
+// 例：登陆密码：123456(普通字符串)
+// 经过加密后：sha1("123456")--"63667287hjdsxcakjd134"(加密后的字符串)
+
+// 2.后台加密
+// 接收到字符串"63667287hjdsxcakjd134"
+// 后台再次加密：md5("63667287hjdsxcakjd134")--"74suwbcdw36dyqxjfgt"（最终加密后的密码）
+// 最终将新的加密字符串写入数据库：74suwbcdw36dyqxjfgt
+
+// 3.登陆
+// 用户名与加密后的密码进行匹配，成功则登录，失败则提示

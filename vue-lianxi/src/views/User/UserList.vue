@@ -1,10 +1,14 @@
 <template>
     <div>
-        控制台首页
+        用户列表
     </div>
 </template>
 <script>
 export default {
+    name:'UserList',
+    setup(props){
+        
+    }
     
 }
 </script>

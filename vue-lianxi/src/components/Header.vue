@@ -9,10 +9,11 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import "../styles/config.scss";
     #header-wrap{
         position: fixed;
         top:0px;
-        left:250px;
+        left:$navMenu;
         right:0px;
         height:75px;
         background-color: #fff;

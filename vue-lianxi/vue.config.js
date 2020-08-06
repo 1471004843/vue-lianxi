@@ -11,14 +11,26 @@ module.exports = {
     lintOnSave: false,
 
     // build时放置生成的静态资源 (js、css、img、fonts) 的 (相对于 outputDir 的) 目录
-    chainWebpack: (config) => { },
+    chainWebpack: (config) => {
+        const svgRule = config.module.rule('svg')
+        svgRule.uses.clear()
+        svgRule
+            .use('svg-sprite-loader')
+            .loader('svg-sprite-loader')
+            .options({
+                symbolId: 'icon-[name]'
+            })
+    
+    },
 
     // 指定生成的 index.html 的输出路径 (相对于 outputDir)。也可以是一个绝对路径。
     configureWebpack: (config) => {
-        config.resolve = {
+        config.resolve = { // 配置解析别名
+            // 自动添加文件名后缀
             extensions: [".js", ".json", ".vue"],
             alias: {
-                "@": path.resolve(__dirname, "./src"),
+                'vue':'vue/dist/vue.js',
+                 "@": path.resolve(__dirname, "./src"),
                 "@c": path.resolve(__dirname, "./src/components"),
                 "@api": path.resolve(__dirname, "./src/api")
             }

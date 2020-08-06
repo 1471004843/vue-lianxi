@@ -1,13 +1,17 @@
 <template>
     <div>
-        控制台首页
+        信息列表
     </div>
 </template>
 <script>
 export default {
+    name:'InfoList',
+    setup(props){
+        
+    }
     
 }
 </script>
 <style lang="scss" scoped>
-    
+   
 </style>

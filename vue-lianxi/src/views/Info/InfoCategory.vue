@@ -1,10 +1,14 @@
 <template>
     <div>
-        控制台首页
+        信息分类
     </div>
 </template>
 <script>
 export default {
+    name:'InfoCategory',
+    setup(props){
+        
+    }
     
 }
 </script>
